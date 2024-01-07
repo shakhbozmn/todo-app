@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from '@expo-google-fonts/dev';
 import CustomButton from "../../components/buttons";
+import CheckBox from 'react-native-check-box'
 
 const HomeScreen = () => {
     const [task, setTask] = useState('');
@@ -17,6 +18,15 @@ const HomeScreen = () => {
     const removeTask = (taskId) => {
         setTasks(tasks.filter((item) => item.id !== taskId));
     };
+
+    const toggleTask = (taskId) => {
+        setTasks(
+            tasks.map((task) =>
+                task.id === taskId ? { ...task, completed: !task.completed } : task
+            )
+        );
+    };
+
 
     let [fontsLoaded, fontError] = useFonts({
         Montserrat_700Bold, Montserrat_400Regular,
@@ -39,7 +49,15 @@ const HomeScreen = () => {
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", marginTop: 10 }}>
-                        <Text>{item.text}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <CheckBox
+                                style={{ paddingRight: 10 }}
+                                checkBoxColor="#007AFF"
+                                isChecked={item.completed}
+                                onClick={() => toggleTask(item.id)}
+                            />
+                            <Text>{item.text}</Text>
+                        </View>
                         <CustomButton style={styles.deletebtn} title="Remove" onPress={() => removeTask(item.id)} />
                     </View>
                 )}
