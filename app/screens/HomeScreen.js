@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-nativ
 import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from '@expo-google-fonts/dev';
 import CustomButton from "../../components/buttons";
 import CheckBox from 'react-native-check-box'
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const HomeScreen = () => {
     const [task, setTask] = useState('');
@@ -26,6 +27,10 @@ const HomeScreen = () => {
             )
         );
     };
+
+    const toggleTaskInText = (taskId) => {
+        toggleTask(taskId);
+    }
 
 
     let [fontsLoaded, fontError] = useFonts({
@@ -56,7 +61,9 @@ const HomeScreen = () => {
                                 isChecked={item.completed}
                                 onClick={() => toggleTask(item.id)}
                             />
-                            <Text>{item.text}</Text>
+                            <TouchableOpacity onClick={() => toggleTaskInText(item.id)}>
+                                <Text >{item.text}</Text>
+                            </TouchableOpacity>
                         </View>
                         <CustomButton style={styles.deletebtn} title="Remove" onPress={() => removeTask(item.id)} />
                     </View>
