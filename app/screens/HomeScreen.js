@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
-import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from '@expo-google-fonts/dev';
-import CustomButton from "../../components/buttons";
-import CheckBox from 'react-native-check-box'
+import { View, Text, TextInput, FlatList, StyleSheet } from 'react-native';
+import CheckBox from 'react-native-check-box';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Swipeout from 'react-native-swipeout';
+import CustomButton from '../../components/buttons';
 
 const HomeScreen = () => {
     const [task, setTask] = useState('');
@@ -30,45 +30,80 @@ const HomeScreen = () => {
 
     const toggleTaskInText = (taskId) => {
         toggleTask(taskId);
-    }
+    };
 
+    const renderTaskItem = ({ item }) => {
+        const swipeoutBtns = [
+            {
+                text: 'Remove',
+                backgroundColor: '#d30000',
+                onPress: () => removeTask(item.id),
+            },
+        ];
 
-    let [fontsLoaded, fontError] = useFonts({
-        Montserrat_700Bold, Montserrat_400Regular,
-    });
+        return (
+            <Swipeout style={{
+                backgroundColor: '#fff',
+                marginBottom: 10,
+                justifyContent: 'center',
+            }}
+                scroll={false}
+                right={swipeoutBtns}
+                autoClose={true}>
+                <View
+                    style={{
+                        backgroundColor: '#fff',
+                        paddingHorizontal: 10,
+                        paddingVertical: 20,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <CheckBox
+                            style={{ paddingRight: 10 }}
+                            checkBoxColor="#007AFF"
+                            isChecked={item.completed}
+                            onClick={() => toggleTask(item.id)}
+                        />
+                        <TouchableOpacity onPress={() => toggleTaskInText(item.id)}>
+                            <Text>{item.text}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Swipeout>
+        );
+    };
 
-    if (!fontsLoaded && !fontError) {
-        return null;
-    }
     return (
         <View style={{ flex: 1, padding: 16 }}>
             <TextInput
-                style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 8, borderRadius: 10 }}
+                style={{
+                    height: 40,
+                    borderColor: 'gray',
+                    borderWidth: 1,
+                    marginBottom: 10,
+                    padding: 8,
+                    borderRadius: 10,
+                }}
                 placeholder="Enter task"
                 value={task}
                 onChangeText={(text) => setTask(text)}
             />
-            <CustomButton style={styles.addbtn} title="Add Task" onPress={addTask} />
-            <FlatList
-                data={tasks}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", marginTop: 10 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <CheckBox
-                                style={{ paddingRight: 10 }}
-                                checkBoxColor="#007AFF"
-                                isChecked={item.completed}
-                                onClick={() => toggleTask(item.id)}
-                            />
-                            <TouchableOpacity onClick={() => toggleTaskInText(item.id)}>
-                                <Text >{item.text}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <CustomButton style={styles.deletebtn} title="Remove" onPress={() => removeTask(item.id)} />
-                    </View>
-                )}
+            <CustomButton
+                style={styles.addbtn}
+                title="Add Task"
+                onPress={addTask}
             />
+            <View style={{ flex: 1, marginTop: 20, }}>
+                <FlatList
+                    scrollEnabled={false}
+                    data={tasks}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={renderTaskItem}
+                />
+            </View>
         </View>
     );
 };
@@ -77,10 +112,6 @@ const styles = StyleSheet.create({
     addbtn: {
         backgroundColor: '#3498db',
     },
-    deletebtn: {
-        backgroundColor: '#d30000',
-    },
-
 });
 
 export default HomeScreen;
